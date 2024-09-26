@@ -14,20 +14,31 @@ namespace Kuuasema.Utils {
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void InitializeApplication() {
             IsRunning = true;
+
+            System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+            stopwatch.Start();
             
             List<InitializeStaticAttribute> attributeOrder = new List<InitializeStaticAttribute>();
             
-            // Assembly assembly = Assembly.GetAssembly(typeof(RuntimeUtils));
+            Assembly utilsAssembly = Assembly.GetAssembly(typeof(RuntimeUtils));
             Assembly[] allAssemblies = AppDomain.CurrentDomain.GetAssemblies();
+            
             foreach (Assembly assembly in allAssemblies) {
-                foreach (Type type in assembly.GetTypes()) {
-                    MethodInfo[] methods = type.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static);
-                    foreach (MethodInfo method in methods) {
-                        InitializeStaticAttribute attribute = Attribute.GetCustomAttribute(method, typeof(InitializeStaticAttribute)) as InitializeStaticAttribute;
-                        if (attribute != null) {
-                            attribute.Method = method;
-                            attributeOrder.Add(attribute);
+
+                foreach (AssemblyName referencedAssembly in assembly.GetReferencedAssemblies()) {
+                    
+                    if (referencedAssembly.FullName == utilsAssembly.FullName) {
+                        foreach (Type type in assembly.GetTypes()) {
+                            MethodInfo[] methods = type.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static);
+                            foreach (MethodInfo method in methods) {
+                                InitializeStaticAttribute attribute = Attribute.GetCustomAttribute(method, typeof(InitializeStaticAttribute)) as InitializeStaticAttribute;
+                                if (attribute != null) {
+                                    attribute.Method = method;
+                                    attributeOrder.Add(attribute);
+                                }
+                            }
                         }
+                        break;
                     }
                 }
             }
@@ -45,6 +56,9 @@ namespace Kuuasema.Utils {
             }
 
             Application.quitting += () => IsQuitting = true;
+
+            stopwatch.Stop();
+            Debug.Log($"InitializeApplication took {stopwatch.Elapsed}");
         }
 
         public static bool IsMainEntry { get; private set; }
