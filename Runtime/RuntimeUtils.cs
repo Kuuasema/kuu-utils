@@ -17,14 +17,17 @@ namespace Kuuasema.Utils {
             
             List<InitializeStaticAttribute> attributeOrder = new List<InitializeStaticAttribute>();
             
-            Assembly assembly = Assembly.GetAssembly(typeof(RuntimeUtils));
-            foreach (Type type in assembly.GetTypes()) {
-                MethodInfo[] methods = type.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static);
-                foreach (MethodInfo method in methods) {
-                    InitializeStaticAttribute attribute = Attribute.GetCustomAttribute(method, typeof(InitializeStaticAttribute)) as InitializeStaticAttribute;
-                    if (attribute != null) {
-                        attribute.Method = method;
-                        attributeOrder.Add(attribute);
+            // Assembly assembly = Assembly.GetAssembly(typeof(RuntimeUtils));
+            Assembly[] allAssemblies = AppDomain.CurrentDomain.GetAssemblies();
+            foreach (Assembly assembly in allAssemblies) {
+                foreach (Type type in assembly.GetTypes()) {
+                    MethodInfo[] methods = type.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static);
+                    foreach (MethodInfo method in methods) {
+                        InitializeStaticAttribute attribute = Attribute.GetCustomAttribute(method, typeof(InitializeStaticAttribute)) as InitializeStaticAttribute;
+                        if (attribute != null) {
+                            attribute.Method = method;
+                            attributeOrder.Add(attribute);
+                        }
                     }
                 }
             }
