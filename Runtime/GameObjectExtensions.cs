@@ -21,7 +21,7 @@ namespace Kuuasema.Utils {
 
         public static bool HasParent(this GameObject self, GameObject other, int allowDepth = -1) {
             if (allowDepth == 0) {
-                Debug.LogError("Cannot check parent depth with zero depth allowed.");
+                Debug.LogError("Cannot check for parent with zero depth allowed.");
                 return false;
             }
             Transform parentTransform = self.transform.parent;
