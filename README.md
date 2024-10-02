@@ -103,13 +103,48 @@ private static void InitSecond() { ... }
 Add this component to the first scene that loads in your application. That way you can distinguish between running the full application and a standalone scene.  
 
 **ScheduledUpdater (MonoBehaviour Class)**  
+This self instantiating (if used) singleton provides access to Unity's different update functions. The different update functions can be subscribed to either as a single call or repeated. Useful for classes that dont want, need or cant hook into those updates directly.  
 
+>**static void RunCoroutine(IEnumerator coroutine)**  
+>*Starts the coroutine. Useful for scripts that dont inherit from UnityEngine.Object and cant therefore start themselves.*  
+
+>**static void RequestUpdate(Action action)**  
+>*Provided action will be called once during next Update.*  
+
+>**static void RequestLateUpdate(Action action)**  
+>*Provided action will be called once during next LateUpdate.*  
+
+>**static void RequestFixedUpdate(Action action)**  
+>*Provided action will be called once during next FixedUpdate.*  
+
+>**static void RequestContinuousUpdate(Action action)**  
+>*Provided action will be called one every subsequent Update, until cancelled.*  
+
+>**static void RequestContinuousLateUpdate(Action action)**  
+>*Provided action will be called one every subsequent LateUpdate, until cancelled.*  
+
+>**static void RequestContinuousFixedUpdate(Action action)**  
+>*Provided action will be called one every subsequent FixedUpdate, until cancelled.*  
+
+>**static void CancelContinuousUpdate(Action action)**  
+>*Cancels continous Update calls to provided action.*  
+
+>**static void CancelContinuousLateUpdate(Action action)**  
+>*Cancels continous LateUpdate calls to provided action.*  
+
+>**static void CancelContinuousFixedUpdate(Action action)**  
+>*Cancels continous FixedUpdate calls to provided action.*  
+
+>**bool InUpdate { get; }**  
+>**bool InLateUpdate { get; }**  
+>**bool InFixedUpdate { get; }**  
+>*These three static properties can tell in what update phase the program is currently in (if any).*  
 
 
 POOLING AND RECYCLING
 ------------
 
-**GenericPool<T> (static Class)**  
+**GenericPool< T > (static Class)**  
 A static class and pool for any type. Since its a template class, only such pools exist that are actually invoked in the program.  
 >**static T Get()**  
 >*Returns an object of type T, from a pool or a new instance if not available.*  
@@ -132,7 +167,7 @@ GenericPool<List<Vector3>>.Recycle(tempVectors);
 
 
 
-**ArrayPool<T> (Class)**  
+**ArrayPool< T > (Class)**  
 A (non static) class that works with fixed size arrays, the size which is determined on the constructor call.
 >**ArrayPool(int size)**  
 >*Creates an array pool of given size.*  
@@ -144,6 +179,7 @@ A (non static) class that works with fixed size arrays, the size which is determ
 >*Recycles the array, setting its contents to default. The default is determined by type of T; it can be null, 0, false, etc...*  
 
 Example usage of the ArrayPool<T>:  
+*Note that this example is just minimal and you should not create a new ArrayPool everytime you need one. Instead have the class that needs these temporaty arrays create the pool (and make sure its destroyed eventually).*  
 ```
 ArrayPool<Vector3> vectorsPool = new ArrayPool<Vector3>(8);
 Vector3[] tempVectors = vectorsPool.Get();  
@@ -196,6 +232,29 @@ SINGLE BEHAVIOURS
 ------------
 
 
+**SingleBehaviour< T > (MonoBehaviour Class)**  
+This is a generec class that encapsulates T which is any class inheriting ultimately from UnityEngine.Component. The idea is that this provides automatic toggling on/off of the comonent so that only one of each type is ever active on the scene at a time. Typical problem that this solves is having an AudioListener or an EventSystem present on each scene, but can be useful for Cameras as well. This will not toggle off any such components that dont have the SingleBehaviour as well.  
+
+>**protected virtual void OnActivate()**  
+>*This is called when the component is activated. Can be overridden but the base implementation should then be called as well.*  
+
+>**protected virtual void OnDeactivate()**  
+>*This is called when the component is deactivated. Can be overridden but the base implementation should then be called as well.*  
+
+
+**SingleEventSystem (MonoBehaviour Class)**  
+This is a SingleBehaviour< EventSystem > class.  
+
+
+**MainCamera (MonoBehaviour Class)**  
+This is a SingleBehaviour< Camera > class.  
+
+>**public static Camera Camera { get }**  
+>*This provides access to the Camera object that the currently active MainCamera encapsulates.*  
+```
+Camera mainCam = MainCamera.Camera;  
+```
+*The key difference between this and Unity's own Camera.main is that this also disables and enables cameras in a predictable way, while Camera.main just returns one of the cameras tagged as Main (seemingly undeterministic) and performs no enabling and disabling of its own.*  
 
 STATE MACHINE
 ------------
@@ -225,7 +284,7 @@ SCRIPTS
 
 **LayerHelper**
 
-**MainCamera**
+--MainCamera--
 
 --MainEntry--
 
@@ -245,9 +304,9 @@ SCRIPTS
 
 --SerializedPropertyExtensions--
 
-**SingleBehaviour**
+--SingleBehaviour--
 
-**SingleEventSystem**
+--SingleEventSystem--
 
 **StateMachine**
 
@@ -260,5 +319,4 @@ SCRIPTS
 **VectorExtensions**
 
 **Wait**
-
 
