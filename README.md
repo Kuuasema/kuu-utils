@@ -147,7 +147,7 @@ This self instantiating (if used) singleton provides access to Unity's different
 >**bool InLateUpdate { get; }**  
 >**bool InFixedUpdate { get; }**  
 >*These three static properties can tell in what update phase the program is currently in (if any).*  
-  
+
 **Wait (static Class)**  
 This class just contains a collection of coroutine yields, for simple reusability.  
 
@@ -313,70 +313,37 @@ Layer name utilities.
 >**Vector3 ClosestPointOnLine(Vector3 point, Vector3 line0, Vector3 line1)**  
 >*Returns the closest point on the line from provided point.*  
 
->**bool PointInPolygon(Vector3 point, List<Vector3> polygon)**  
+>**bool PointInPolygon(Vector3 point, List< Vector3 > polygon)**  
 >*Returns true if the point is inside the polygon.*  
 
 
 
 **RandomSource (Class)**  
+Works with unity Random, keping track of the random state and allowing to keep multiple random yet deterministic states that do not get interference of other users of the Random class.  
+Additionally it maintains an internal state stack that can be pushed and popped. 
+Useful in making deterministic procedural systems that are resilient to changes, meaning if one part is changed then it wont cascade to other parts.
+
+>**void Push()**  
+>*Pushes the random state stack.*  
+
+>**void Pop()**  
+>*Pops the random state stack.*  
+
+>**float Next()**  
+>*Retuns next random value.*  
+
+>**float Range(float min, float max)**  
+>*Returns arandom within range.*  
+
+>**bool Bool()**  
+>*Returns true or false.*  
 
 **TextUtils (static Class)**  
 
-**Triangulator (Class)**  
-
-
-
-SCRIPTS
-============
---DisableInspectorAttribute--
-
---FaceCameraWorldCanvas--  
-
---GameObjectExtensions--
-
---GenericPool--
-
---GUID--
-
---InitializeStaticAttribute--
-
---InputRaycaster--  
-
---LayerHelper--  
-
---MainCamera--
-
---MainEntry--
-
---MathUtils--  
-
---MinMaxSliderAttribute--
-
---RandomSource--  
-
---RecycleBin--
-
---RecycleToQueue--
-
---RuntimeUtils--
-
---ScheduledUpdater--
-
---SerializedPropertyExtensions--
-
---SingleBehaviour--
-
---SingleEventSystem--
-
---StateMachine--
-
---TextUtils--
-
---TransformExtensions--
-
---Triangulator--
-
---VectorExtensions--
-
---Wait--  
+>**string PadCapitalizedString(string text, bool captializeFirst = false)**  
+>*Adds spaces to capital letters.*  
+```
+TextUtils.PadCapitalizedString("myString"); --> "my String"
+TextUtils.PadCapitalizedString("myString", true); --> "My String"
+```
 
