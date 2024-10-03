@@ -58,6 +58,14 @@ UNITY OBJECT EXTENSIONS
 >**public bool TryCountParentDistance(Transform parent, out int distance)**  
 >*Counts the hierarchial distance to given parent. Returns false if parameter is not a parent to this transform. Else returns true and sets the out parameter to the distance found.*  
 
+**VectorExtensions (static Class)**  
+
+>**bool IsDistanceCloser(Vector3 other, float distance)**  
+>*Returns true if the other vector is closer than the provided distance.*  
+
+>**bool IsPlanarDistanceCloser(Vector3 other, float distance)**  
+>*Similar to the IsDistanceCloser function, except the **y** component is ignored.*  
+
 **SerializedPropertyExtensions (static Class)**  
 
 >**public SerializedProperty FindParentProperty()**  
@@ -139,7 +147,19 @@ This self instantiating (if used) singleton provides access to Unity's different
 >**bool InLateUpdate { get; }**  
 >**bool InFixedUpdate { get; }**  
 >*These three static properties can tell in what update phase the program is currently in (if any).*  
+  
+**Wait (static Class)**  
+This class just contains a collection of coroutine yields, for simple reusability.  
 
+**WaitForSeconds ONE_MILLISECOND;**  
+**WaitForSeconds ONE_SECOND;**  
+**WaitForSeconds TEN_SECONDS;**  
+**WaitForFixedUpdate FOR_FIXED_UPDATE;**  
+
+Example:  
+```
+yield return Wait.ONE_SECOND;
+```
 
 POOLING AND RECYCLING
 ------------
@@ -216,7 +236,7 @@ This will probably need a good example... (TODO).
 >*Places the game object in the recycle bin.*  
 
 >**private void EmptyBin()**  
->*This is a private method, only accessible trough the context menu ("Log Contents") of the recycle bin game object. It destroys all the game objects placed in the recycle bin.*   
+>*This is a private method, only accessible trough the context menu ("Empty Bin") of the recycle bin game object. It destroys all the game objects placed in the recycle bin.*   
 
 >**private void EmptyGarbage()**  
 >*This is a private method, only accessible trough the context menu ("Empty Garbage") of the recycle bin game object. It destroys all the game objects placed in the recycle bin, except those that have the RecycleToQueue component with a valid Queue.*  
@@ -259,10 +279,50 @@ Camera mainCam = MainCamera.Camera;
 STATE MACHINE
 ------------
 
+**StateMachine< T > (Class)**
+This is a generic class where T is any Enum type, representing the states. This has a stack and supports pushing and popping states.  
 
+**StateMachine< T >.State (Class)**
+State logic is implemented by extending the State class found within the StateMachine.  
+
+*The StateMachine will need a separate example.*  
 
 MISCELANEOUS UTILITIES
 ------------
+
+**GUID (Class)**  
+A class wrapper around System.Guid allowing it to be serialized and shown in the inspector.  
+
+**FaceCameraWorldCanvas (MonoBehaviour Class)**  
+Makes a world canvas always face its camera.  
+
+**InputRaycaster (MonoBehaviour Class)**  
+A class with more advanced raycast results. 
+
+**LayerHelper (static Class)**  
+Layer name utilities.  
+
+**MathUtils (static Class)**  
+
+>**float SqrDistance(Vector3 a, Vector3 b)**  
+>*Returns the square distance between two vectors.*  
+
+>**bool LineIntersect(Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4, out Vector3 intersect, float maxDistance = float.MaxValue)**  
+>*Returns the intersection point of two lines (p1,p2) and (p3,p4).*  
+
+>**Vector3 ClosestPointOnLine(Vector3 point, Vector3 line0, Vector3 line1)**  
+>*Returns the closest point on the line from provided point.*  
+
+>**bool PointInPolygon(Vector3 point, List<Vector3> polygon)**  
+>*Returns true if the point is inside the polygon.*  
+
+
+
+**RandomSource (Class)**  
+
+**TextUtils (static Class)**  
+
+**Triangulator (Class)**  
 
 
 
@@ -270,29 +330,29 @@ SCRIPTS
 ============
 --DisableInspectorAttribute--
 
-**FaceCameraWorldCanvas**
+--FaceCameraWorldCanvas--  
 
 --GameObjectExtensions--
 
 --GenericPool--
 
-**GUID**
+--GUID--
 
 --InitializeStaticAttribute--
 
-**InputRaycaster**
+--InputRaycaster--  
 
-**LayerHelper**
+--LayerHelper--  
 
 --MainCamera--
 
 --MainEntry--
 
-**MathUtils**
+--MathUtils--  
 
 --MinMaxSliderAttribute--
 
-**RandomSource**
+--RandomSource--  
 
 --RecycleBin--
 
@@ -308,15 +368,15 @@ SCRIPTS
 
 --SingleEventSystem--
 
-**StateMachine**
+--StateMachine--
 
-**TextUtils**
+--TextUtils--
 
 --TransformExtensions--
 
-**Triangulator**
+--Triangulator--
 
-**VectorExtensions**
+--VectorExtensions--
 
-**Wait**
+--Wait--  
 
