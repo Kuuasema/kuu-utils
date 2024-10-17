@@ -1,8 +1,8 @@
 {
-  "name": "com.kuuasema.rtt-engine-utils",
+  "name": "com.kuuasema.utils",
   "version": "1.0.0",
-  "displayName": "rtt-engine-utils",
-  "description": "rtt-engine-utils",
+  "displayName": "kuu-utils",
+  "description": "kuu-utils",
   "unity": "2020.1",
   "unityRelease": "0f1",
   "documentationUrl": "https://kuuasema.com/",
@@ -13,7 +13,6 @@
  },
  "keywords": [
     "Kuuasema",
-    "RTT Engine",
     "Utils"
   ],
   "author": {
