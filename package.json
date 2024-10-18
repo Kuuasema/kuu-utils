@@ -1,0 +1,23 @@
+{
+  "name": "com.kuuasema.utils",
+  "version": "1.0.0",
+  "displayName": "kuu-utils",
+  "description": "kuu-utils",
+  "unity": "2020.1",
+  "unityRelease": "0f1",
+  "documentationUrl": "https://kuuasema.com/",
+  "changelogUrl": "https://kuuasema.com/changelog.html",
+  "licensesUrl": "https://kuuasema.com/licensing.html",
+  "dependencies": {
+    
+ },
+ "keywords": [
+    "Kuuasema",
+    "Utils"
+  ],
+  "author": {
+    "name": "Kuuasema",
+    "email": "@kuuasema.com",
+    "url": "https://www.kuuasema.com"
+  }
+}
