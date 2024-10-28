@@ -1,6 +1,6 @@
 {
   "name": "com.kuuasema.utils",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "displayName": "kuu-utils",
   "description": "kuu-utils",
   "unity": "2020.1",
@@ -19,5 +19,12 @@
     "name": "Kuuasema",
     "email": "@kuuasema.com",
     "url": "https://www.kuuasema.com"
-  }
+  },
+  "samples": [
+    {
+        "displayName": "Sample 1",
+        "description": "Sample 1 ....",
+        "path": "Samples~/Sample1"
+    }
+  ]
 }
