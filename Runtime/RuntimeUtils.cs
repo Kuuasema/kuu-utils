@@ -22,23 +22,27 @@ namespace Kuuasema.Utils {
             
             Assembly utilsAssembly = Assembly.GetAssembly(typeof(RuntimeUtils));
             Assembly[] allAssemblies = AppDomain.CurrentDomain.GetAssemblies();
-            
+            Assembly mainAssembly = Assembly.GetAssembly(typeof(UnityEngine.Object));
             foreach (Assembly assembly in allAssemblies) {
-
-                foreach (AssemblyName referencedAssembly in assembly.GetReferencedAssemblies()) {
-                    
-                    if (referencedAssembly.FullName == utilsAssembly.FullName) {
-                        foreach (Type type in assembly.GetTypes()) {
-                            MethodInfo[] methods = type.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static);
-                            foreach (MethodInfo method in methods) {
-                                InitializeStaticAttribute attribute = Attribute.GetCustomAttribute(method, typeof(InitializeStaticAttribute)) as InitializeStaticAttribute;
-                                if (attribute != null) {
-                                    attribute.Method = method;
-                                    attributeOrder.Add(attribute);
-                                }
+                bool useAssembly = assembly == mainAssembly || assembly.FullName.Contains("Assembly-CSharp");
+                if (!useAssembly) {
+                    foreach (AssemblyName referencedAssembly in assembly.GetReferencedAssemblies()) {
+                        if (referencedAssembly.FullName == utilsAssembly.FullName) {
+                            useAssembly = true;
+                            break;
+                        }
+                    }
+                }
+                if (useAssembly) {
+                    foreach (Type type in assembly.GetTypes()) {
+                        MethodInfo[] methods = type.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static);
+                        foreach (MethodInfo method in methods) {
+                            InitializeStaticAttribute attribute = Attribute.GetCustomAttribute(method, typeof(InitializeStaticAttribute)) as InitializeStaticAttribute;
+                            if (attribute != null) {
+                                attribute.Method = method;
+                                attributeOrder.Add(attribute);
                             }
                         }
-                        break;
                     }
                 }
             }
