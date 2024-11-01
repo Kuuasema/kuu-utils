@@ -1,6 +1,6 @@
 {
   "name": "com.kuuasema.utils",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "displayName": "kuu-utils",
   "description": "kuu-utils",
   "unity": "2020.1",
@@ -17,7 +17,7 @@
   ],
   "author": {
     "name": "Kuuasema",
-    "email": "@kuuasema.com",
+    "email": "opensource@kuuasema.com",
     "url": "https://www.kuuasema.com"
   },
   "samples": [
