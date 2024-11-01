@@ -4,7 +4,7 @@ KUU UTILS
 ABOUT
 ------------
 This package has no dependencies and contains useful utilities as well as simple generic features.  
-This package and its related source code files are licensed under the terms of the <script src="LICENSE.md">MIT license</script>.
+This package and its related source code files are licensed under the terms of the [MIT license](LICENSE.md).
 
 SETUP
 ------------
