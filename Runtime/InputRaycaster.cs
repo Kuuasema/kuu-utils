@@ -1,147 +1,56 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 namespace Kuuasema.Utils {
-    public class InputRaycaster : MonoBehaviour { // EnableViewModel
+    public class InputRaycaster : SingleBehaviour<InputRaycaster> { 
 
-        public static ScreenRaycasts Cursor { get; private set; } = new ScreenRaycasts();
-        public static ScreenRaycasts ScreenCenter { get; private set; } = new ScreenRaycasts();
+        [SerializeField] internal LayerMask blockingLayers;
+        [SerializeField] internal LayerMask hudBlockerLayer;
+
+        public static bool IsOverHUD = false;
+
+        public static ScreenRaycasts Cursor { get; private set; }
+        public static ScreenRaycasts ScreenCenter { get; private set; }
+        private ScreenRaycasts cursor;
+        private ScreenRaycasts screenCenter;
         
-        // private static RaycastHit[] cursorHitsAll = new RaycastHit[MAX_RAYCAST_HITS];
-        // private static List<RaycastHit> cursorHitsSorted = new List<RaycastHit>();
-
         private static List<ScreenRaycasts> AllRaycasts = new List<ScreenRaycasts>() {
             Cursor,
             ScreenCenter
         };
 
+        protected override void Awake() {
+            base.Awake();
+            cursor = new ScreenRaycasts(this);
+            screenCenter = new ScreenRaycasts(this);
+        }
+
+        protected override void OnActivate() {
+            base.OnActivate();
+            Cursor = this.cursor;
+            ScreenCenter = this.screenCenter;
+        }
+
         private void Update() {
             // setup positions
-            Cursor.ScreenPosition = UnityEngine.Input.mousePosition;
-            ScreenCenter.ScreenPosition = new Vector3(Screen.width, Screen.height, 0) / 2;
-            // raycast
-            foreach (ScreenRaycasts raycasts in AllRaycasts) {
-                raycasts.Clear();
-                raycasts.Raycast();
-            }
-            // // 1.) get full raycast under cursor, then re-use that result for everything else
-            // cursorHitsSorted.Clear();
-            // Ray cursorRay = MainCamera.Instance.Behaviour.ScreenPointToRay(Input.mousePosition);
-            // int hits = Physics.RaycastNonAlloc(cursorRay, cursorHitsAll);
-            // for (int i = 0; i < hits; i++) {
-            //     cursorHitsSorted.Add(cursorHitsAll[i]);
-            // }
-            // cursorHitsSorted.Sort((a,b) => a.distance.CompareTo(b.distance));
+            cursor.ScreenPosition = UnityEngine.Input.mousePosition;
+            screenCenter.ScreenPosition = new Vector3(Screen.width, Screen.height, 0) / 2;
+            
+            // Clear and update raycasts
+            cursor.Clear();
+            screenCenter.Clear();
+            
+            // Do extra HUD check for cursor raycasts
+            cursor.Raycast(true);
+            screenCenter.Raycast(false);
         }
 
         private void OnDisable() {
-            // cursorHitsSorted.Clear();
             foreach (ScreenRaycasts raycasts in AllRaycasts) {
                 raycasts.Clear();
             }
         }
-
-        // protected override void OnEnableView() {
-        //     this.enabled = true;
-        // }
-        // protected override void OnDisableView() {
-        //     this.enabled = false;
-        // }
-
-        // public static Component GetCursorHit(out RaycastHit? hitInfo, IEnumerable<Type> componentTypes = null, List<Component> filter = null, int layerMask = int.MaxValue) {
-        //     if (TryGetCursorHit(out Component hitComponent, out hitInfo, componentTypes, filter, layerMask)) {
-        //         return hitComponent;
-        //     }
-        //     return null;
-        // }
-
-        // public static bool TryGetCursorHit(out RaycastHit? hitInfo, int layerMask = int.MaxValue) {
-        //     hitInfo = null;
-        //     foreach (RaycastHit hit in cursorHitsSorted) {
-        //         int hitLayer = 1 << hit.collider.gameObject.layer;
-        //         if ((layerMask & hitLayer) == hitLayer) {
-        //             hitInfo = hit;
-        //             return true;
-        //         }
-        //     }
-        //     return false;
-        // }
-
-        // public static bool TryGetCursorHit(out Component hitComponent, out RaycastHit? hitInfo, IEnumerable<Type> componentTypes = null, List<Component> filter = null, int layerMask = int.MaxValue) {
-        //     hitInfo = null;
-        //     hitComponent = null;
-        //     foreach (RaycastHit hit in cursorHitsSorted) {
-        //         GameObject hitObject = hit.collider.gameObject;
-        //         int hitLayer = 1 << hitObject.layer;
-        //         if ((layerMask & hitLayer) == hitLayer) {
-                    
-        //             if (componentTypes != null) {
-        //                 int closestDistance = int.MaxValue;
-        //                 Component closestComponent = null;
-        //                 foreach (Type componentType in componentTypes) {
-        //                     Component behaviour = hitObject.GetComponentInParent(componentType);
-        //                     if (filter != null && filter.Count > 0 && !filter.Contains(behaviour)) {
-        //                         // not registered for event
-        //                     } else {
-        //                         if (hitObject.transform.TryCountParentDistance(behaviour.transform, out int distance)) {
-        //                             if (distance < closestDistance) {
-        //                                 closestDistance = distance;
-        //                                 closestComponent = behaviour;
-        //                             }
-        //                         }
-        //                     }
-        //                 }
-
-        //                 if (closestComponent != null) {
-        //                     hitInfo = hit;
-        //                     hitComponent = closestComponent;
-        //                     return true;
-        //                 }
-        //             }
-        //         }
-        //     }
-        //     return false;
-        // }
-
-        // public static T GetCursorHit<T>(int layerMask = int.MaxValue) where T : Component {
-        //     if (TryGetCursorHit<T>(out T behaviour, out RaycastHit? hitInfo, null, layerMask)) {
-        //         return behaviour;
-        //     }
-        //     return null;
-        // }
-
-        // public static bool TryGetCursorHit<T>(out T behaviour, out RaycastHit? hitInfo, List<GameObject> filter = null, int layerMask = int.MaxValue) where T : Component {
-        //     behaviour = null;
-        //     if (TryGetCursorHit(out Component _behaviour, typeof(T), out hitInfo, filter, layerMask)) {
-        //         behaviour = _behaviour as T;
-        //         return behaviour != null;
-        //     }
-        //     return false;
-        // }
-
-        // public static bool TryGetCursorHit(out Component behaviour, System.Type componentType, out RaycastHit? hitInfo, List<GameObject> filter = null, int layerMask = int.MaxValue) {
-        //     behaviour = null;
-        //     hitInfo = null;
-        //     foreach (RaycastHit hit in cursorHitsSorted) {
-        //         int hitLayer = 1 << hit.collider.gameObject.layer;
-        //         if ((layerMask & hitLayer) == hitLayer) {
-        //             hitInfo = hit;
-        //             behaviour = hit.collider.gameObject.GetComponent(componentType);
-        //             if (behaviour == null) {
-        //                 behaviour = hit.collider.gameObject.GetComponentInParent(componentType);
-        //             }
-        //             if (behaviour != null) {
-        //                 if (filter != null && filter.Count > 0 && !filter.Contains(behaviour.gameObject)) {
-        //                     behaviour = null;
-        //                 } else {
-        //                     return true;
-        //                 }
-        //             }
-        //         }
-        //     }
-        //     return false;
-        // }
-
 
         ///////
         //// ScreenRaycasts
@@ -154,31 +63,56 @@ namespace Kuuasema.Utils {
             public Vector2 ScreenPosition { get; set; }
             public Ray Ray { get; private set; }
             public RaycastHit[] HitsAll { get; set; } = new RaycastHit[MAX_RAYCAST_HITS];
+            public RaycastHit[] HitsHUD { get; set; } = new RaycastHit[MAX_RAYCAST_HITS];
             public List<RaycastHit> HitsSorted { get; set; } = new List<RaycastHit>();
+            public Vector3 ZeroPlaneHit { get; private set; }
+
+            private InputRaycaster raycaster { get; set; }
+
+            public ScreenRaycasts(InputRaycaster raycaster) {
+                this.raycaster = raycaster;
+            }
         
             public void Clear() {
                 this.HitsSorted.Clear();
             }
 
-            public void Raycast(Ray? customRay = null) {
-                if (customRay.HasValue) {
-                    this.Ray = customRay.Value;
-                } else {
-                    // if (MainCamera.Instance == null) return;
-                    Camera camera = Camera.current;
-                    if (camera != null) {
-                        this.Ray = camera.ScreenPointToRay(this.ScreenPosition);
+            public void Raycast(bool doHUDCheck) {
+                if (GameCamera.Instance != null) {
+                    this.Ray = GameCamera.Camera.ScreenPointToRay(this.ScreenPosition);
+                    int hits = Physics.RaycastNonAlloc(this.Ray, this.HitsAll);
+                    for (int i = 0; i < hits; i++) {
+                        this.HitsSorted.Add(this.HitsAll[i]);
                     }
+                    this.HitsSorted.Sort((a,b) => a.distance.CompareTo(b.distance));
+                } else if (MainCamera.Instance != null) {
+                    this.Ray = MainCamera.Camera.ScreenPointToRay(this.ScreenPosition);
+                    int hits = Physics.RaycastNonAlloc(this.Ray, this.HitsAll);
+                    for (int i = 0; i < hits; i++) {
+                        this.HitsSorted.Add(this.HitsAll[i]);
+                    }
+                    this.HitsSorted.Sort((a,b) => a.distance.CompareTo(b.distance));
                 }
-                int hits = Physics.RaycastNonAlloc(this.Ray, this.HitsAll);
-                for (int i = 0; i < hits; i++) {
-                    this.HitsSorted.Add(this.HitsAll[i]);
+
+                if (doHUDCheck && HUDCamera.Instance != null) {
+                    bool isOverHUDThisFrame = false;
+                    this.Ray = HUDCamera.Camera.ScreenPointToRay(this.ScreenPosition);
+                    int hitsHUD = Physics.RaycastNonAlloc(this.Ray, this.HitsHUD);
+                    
+                    for (int i = 0; !isOverHUDThisFrame && i < hitsHUD; i++) {
+                        int hitLayer = 1 << HitsHUD[i].collider.gameObject.layer;
+                        isOverHUDThisFrame = (this.raycaster.hudBlockerLayer & hitLayer) != 0;
+                    }
+                    InputRaycaster.IsOverHUD = isOverHUDThisFrame;
                 }
-                this.HitsSorted.Sort((a,b) => a.distance.CompareTo(b.distance));
+                
+                if (new Plane(Vector3.up, Vector3.zero).Raycast(this.Ray, out float enter)) {
+                    this.ZeroPlaneHit = this.Ray.GetPoint(enter);
+                }
             }
 
-            public Component GetHit(out RaycastHit? hitInfo, IEnumerable<Type> componentTypes = null, List<Component> filter = null, int layerMask = int.MaxValue) {
-                if (TryGetHit(out Component hitComponent, out hitInfo, componentTypes, filter, layerMask)) {
+            public Component GetHit(out RaycastHit? hitInfo, int layerMask = int.MaxValue, IEnumerable<Type> componentTypes = null, List<Component> filter = null) {
+                if (TryGetHit(out Component hitComponent, out hitInfo, layerMask, componentTypes, filter)) {
                     return hitComponent;
                 }
                 return null;
@@ -187,6 +121,7 @@ namespace Kuuasema.Utils {
             public bool TryGetHit(out RaycastHit? hitInfo, int layerMask = int.MaxValue) {
                 hitInfo = null;
                 foreach (RaycastHit hit in this.HitsSorted) {
+                    if (hit.collider == null || hit.collider.gameObject == null) continue;
                     int hitLayer = 1 << hit.collider.gameObject.layer;
                     if ((layerMask & hitLayer) == hitLayer) {
                         hitInfo = hit;
@@ -196,10 +131,15 @@ namespace Kuuasema.Utils {
                 return false;
             }
 
-            public bool TryGetHit(out Component hitComponent, out RaycastHit? hitInfo, IEnumerable<Type> componentTypes = null, List<Component> filter = null, int layerMask = int.MaxValue) {
+            public bool TryGetHit(out Component hitComponent, out RaycastHit? hitInfo, IEnumerable<Type> componentTypes, List<Component> filter) {
+                return TryGetHit(out hitComponent, out hitInfo, componentTypes, filter);
+            }
+            
+            public bool TryGetHit(out Component hitComponent, out RaycastHit? hitInfo, int layerMask = int.MaxValue, IEnumerable<Type> componentTypes = null, List<Component> filter = null) {
                 hitInfo = null;
                 hitComponent = null;
                 foreach (RaycastHit hit in this.HitsSorted) {
+                    if (hit.collider == null || hit.collider.gameObject == null) continue;
                     GameObject hitObject = hit.collider.gameObject;
                     int hitLayer = 1 << hitObject.layer;
                     if ((layerMask & hitLayer) == hitLayer) {
@@ -227,31 +167,43 @@ namespace Kuuasema.Utils {
                                 return true;
                             }
                         }
+                        if ((this.raycaster.blockingLayers & hitLayer) == hitLayer) {
+                            return false;
+                        }
                     }
                 }
                 return false;
             }
 
+            public bool IsOverHUD() {
+                return this.HitsSorted.Select(hit => hit.collider.gameObject.layer)
+                    .Select(hitLayer => (this.raycaster.hudBlockerLayer & hitLayer) == hitLayer).FirstOrDefault();
+            }
+
             public T GetHit<T>(int layerMask = int.MaxValue) where T : Component {
-                if (TryGetHit<T>(out T behaviour, out RaycastHit? hitInfo, null, layerMask)) {
+                if (TryGetHit<T>(out T behaviour, out RaycastHit? hitInfo, layerMask, null)) {
                     return behaviour;
                 }
                 return null;
             }
 
-            public bool TryGetHit<T>(out T behaviour, out RaycastHit? hitInfo, List<GameObject> filter = null, int layerMask = int.MaxValue) where T : Component {
+            public bool TryGetHit<T>(out T behaviour, out RaycastHit? hitInfo, int layerMask = int.MaxValue, List<GameObject> filter = null) where T : Component {
                 behaviour = null;
-                if (TryGetHit(out Component _behaviour, typeof(T), out hitInfo, filter, layerMask)) {
+                if (TryGetHit(out Component _behaviour, typeof(T), out hitInfo, layerMask, filter)) {
                     behaviour = _behaviour as T;
                     return behaviour != null;
                 }
                 return false;
             }
 
-            public bool TryGetHit(out Component behaviour, System.Type componentType, out RaycastHit? hitInfo, List<GameObject> filter = null, int layerMask = int.MaxValue) {
+            public bool TryGetHit(out Component behaviour, System.Type componentType, out RaycastHit? hitInfo, int layerMask = int.MaxValue, List<GameObject> filter = null) {
                 behaviour = null;
                 hitInfo = null;
                 foreach (RaycastHit hit in this.HitsSorted) {
+                    // since raycasts are collected only once each frame
+                    // and an object might be destroyed later that frame
+                    // null check is needed because the list may be iterated after the destruction
+                    if (hit.collider == null || hit.collider.gameObject == null) continue;
                     int hitLayer = 1 << hit.collider.gameObject.layer;
                     if ((layerMask & hitLayer) == hitLayer) {
                         hitInfo = hit;
@@ -265,6 +217,9 @@ namespace Kuuasema.Utils {
                             } else {
                                 return true;
                             }
+                        }
+                        if ((this.raycaster.blockingLayers & hitLayer) == hitLayer) {
+                            return false;
                         }
                     }
                 }

@@ -78,7 +78,6 @@ namespace Kuuasema.Utils {
             if (this.disableGameObject) {
                 this.gameObject.SetActive(false);
             }
-            
         }
     }
 }
