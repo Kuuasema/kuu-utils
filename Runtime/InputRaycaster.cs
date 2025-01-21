@@ -5,6 +5,7 @@ using System.Linq;
 namespace Kuuasema.Utils {
     public class InputRaycaster : SingleBehaviour<InputRaycaster> { 
 
+        [SerializeField] internal LayerMask commonHitLayers;
         [SerializeField] internal LayerMask blockingLayers;
         [SerializeField] internal LayerMask hudBlockerLayer;
 
@@ -12,6 +13,10 @@ namespace Kuuasema.Utils {
 
         public static ScreenRaycasts Cursor { get; private set; }
         public static ScreenRaycasts ScreenCenter { get; private set; }
+        public static int COMMON_LAYERS  { get; private set; }
+        public static int BLOCKING_LAYERS  { get; private set; }
+        public static int HUD_BLOCKER_LAYER  { get; private set; }
+
         private ScreenRaycasts cursor;
         private ScreenRaycasts screenCenter;
         
@@ -30,6 +35,9 @@ namespace Kuuasema.Utils {
             base.OnActivate();
             Cursor = this.cursor;
             ScreenCenter = this.screenCenter;
+            COMMON_LAYERS = this.commonHitLayers;
+            BLOCKING_LAYERS = this.blockingLayers;
+            HUD_BLOCKER_LAYER = this.hudBlockerLayer;
         }
 
         private void Update() {
@@ -47,8 +55,10 @@ namespace Kuuasema.Utils {
         }
 
         private void OnDisable() {
-            foreach (ScreenRaycasts raycasts in AllRaycasts) {
-                raycasts.Clear();
+            if (AllRaycasts != null) {
+                foreach (ScreenRaycasts raycasts in AllRaycasts) {
+                    if (raycasts != null) raycasts.Clear();
+                }
             }
         }
 

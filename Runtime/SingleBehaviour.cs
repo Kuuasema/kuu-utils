@@ -67,7 +67,7 @@ namespace Kuuasema.Utils {
         protected virtual void OnActivate() {
             this.isActivated = true;
             if (this.disableGameObject) {
-                this.gameObject.SetActive(true);
+                this.gameObject.TrySetActive(true);
             }
             this.behaviour.enabled = true;
         }
@@ -76,7 +76,7 @@ namespace Kuuasema.Utils {
             this.isActivated = false;
             this.behaviour.enabled = false;
             if (this.disableGameObject) {
-                this.gameObject.SetActive(false);
+                this.gameObject.TrySetActive(false);
             }
         }
     }
