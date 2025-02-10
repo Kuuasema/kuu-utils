@@ -35,7 +35,7 @@ namespace Kuuasema.Utils {
     }
 
     public static class GenericPool {
-        private static Type PoolType = Type.GetType("Kuuasema.Engine.GenericPool`1");
+        private static Type PoolType = typeof(GenericPool<>);
         private static Dictionary<Type,Type> PoolTypeMap = new Dictionary<Type, Type>();
         private static object[] recycleArgs = new object[1];
         public static object GetFromPool(Type type) {
