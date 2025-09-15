@@ -142,7 +142,7 @@ namespace Kuuasema.Utils {
             }
 
             public bool TryGetHit(out Component hitComponent, out RaycastHit? hitInfo, IEnumerable<Type> componentTypes, List<Component> filter) {
-                return TryGetHit(out hitComponent, out hitInfo, componentTypes, filter);
+                return TryGetHit(out hitComponent, out hitInfo, int.MaxValue, componentTypes, filter);
             }
             
             public bool TryGetHit(out Component hitComponent, out RaycastHit? hitInfo, int layerMask = int.MaxValue, IEnumerable<Type> componentTypes = null, List<Component> filter = null) {
