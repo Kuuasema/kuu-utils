@@ -34,6 +34,7 @@ namespace Kuuasema.Utils {
         }
         // the states can stack
         public List<T> StateStack { get; private set; } = new List<T>();
+        public T TopState => StateStack[^1];
         public Dictionary<T,State> StateMap { get; private set; } = new Dictionary<T,State>();
         public Queue<T> StateQueue { get; private set; } = new Queue<T>();
 
@@ -78,8 +79,7 @@ namespace Kuuasema.Utils {
             this.inUpdate = true;
 
             // update topmost state, and the trickle down and update for as long as the states permit
-            T top = this.StateStack[^1];
-            State topState = this.StateMap[top];
+            State topState = this.StateMap[TopState];
             topState.UpdateTopState();
             if (topState.PassUpdateDown) {
                 for (int i = this.StateStack.Count - 2; i >= 0; i--) {
@@ -90,7 +90,7 @@ namespace Kuuasema.Utils {
                 }
             }
             this.inUpdate = false;
-            return top;
+            return TopState;
         }
 
         private bool TryStateDequeue() {
@@ -115,9 +115,12 @@ namespace Kuuasema.Utils {
         }
 
         public bool IsStatePushing { get; private set; }
+        public bool IsStateInserting { get; private set; }
         public bool IsStatePopping { get; private set; }
         public T NextState { get; private set; }
-        
+        public T InsertingState { get; private set; }
+        public int InsertingStateIndex { get; private set; }
+
         /**
         * States can be pushed on top of each other.
         * 25.07.2023 Jaakko, made this private to enforce the use of TryPushState instead
@@ -130,8 +133,7 @@ namespace Kuuasema.Utils {
             this.IsStatePushing = true;
             this.NextState = _state;
             if (this.StateStack.Count > 0) {
-                T top = this.StateStack[^1];
-                this.StateMap[top].OnStateDown();
+                this.StateMap[TopState].OnStateDown();
             }
             this.StateStack.Add(_state);
             State state = this.StateMap[_state];
@@ -163,6 +165,59 @@ namespace Kuuasema.Utils {
         }
 
         /**
+        * States can be inserted into the list.
+        * 09.09.2025 Jakub, added this to enable queueing states
+        */
+        private void InsertState(T _state, int index)
+        {
+            if (this.inUpdate)
+            {
+                this.InsertStateDeferred(_state, index);
+                return;
+            }
+            this.IsStateInserting = true;
+            this.InsertingState = _state;
+            this.StateStack.Insert(index, _state);
+            State state = this.StateMap[_state];
+            if (!state.Initialized)
+            {
+                state.Initialize();
+            }
+            this.IsStateInserting = false;
+            if (StateStack.Count-1 <= index)
+            {
+                state.OnStateEnter();
+            }
+        }
+
+        public bool TryInsertState(T _state, int index)
+        {
+            if (this.IsStateInserting)
+            {
+                if (EqualityComparer<T>.Default.Equals(this.InsertingState, _state))
+                {
+                    Debug.LogWarning($"TryInsertState({_state}) while: IsStateInserting = {this.IsStateInserting}, InsertingState = {this.InsertingState}, InsertingStateIndex = {this.InsertingStateIndex})");
+                }
+                else
+                {
+                    Debug.LogError($"TryInsertState({_state}) while: IsStateInserting = {this.IsStateInserting}, InsertingState = {this.InsertingState}, InsertingStateIndex = {this.InsertingStateIndex})");
+                }
+                return false;
+            }
+
+            this.InsertStateDeferred(_state, index);
+            return true;
+        }
+
+        public void InsertStateDeferred(T _state, int index)
+        {
+            this.IsStateInserting = true;
+            this.InsertingState = _state;
+            this.InsertingStateIndex = index;
+            ScheduledUpdater.RequestLateUpdate(() => this.InsertState(_state, index));
+        }
+
+        /**
         * States can be popped
         */
         private void PopState() {
@@ -172,15 +227,13 @@ namespace Kuuasema.Utils {
             }
             this.IsStatePopping = true;
             if (this.StateStack.Count > 0) {
-                T top = this.StateStack[^1];
-                this.StateMap[top].OnStateExit();
+                this.StateMap[TopState].OnStateExit();
                 this.StateStack.RemoveAt(this.StateStack.Count - 1);
             }
             this.NextState = default(T);
             if (this.StateStack.Count > 0) {
-                T top = this.StateStack[^1];
-                this.StateMap[top].OnStateUp();
-                this.NextState = top;
+                this.StateMap[TopState].OnStateUp();
+                this.NextState = TopState;
             }
             this.IsStatePopping = false;
         }
