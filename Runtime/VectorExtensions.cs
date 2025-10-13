@@ -42,14 +42,14 @@ namespace Kuuasema.Utils {
             return Vector3.SignedAngle(a, b, Vector3.up);
         }
 
-        public static bool IsDistanceCloser(this Vector3 self, Vector3 other, float distance) {
+        public static bool IsDistanceWithin(this Vector3 self, Vector3 other, float distance) {
             float sqrDistance = distance * distance;
-            return SqrDistance(self,other) < distance;
+            return SqrDistance(self,other) <= distance;
         }
 
-        public static bool IsPlanarDistanceCloser(this Vector3 self, Vector3 other, float distance) {
+        public static bool IsPlanarDistanceWithin(this Vector3 self, Vector3 other, float distance) {
             float sqrDistance = distance * distance;
-            return SqrPlanarDistance(self,other) < sqrDistance;
+            return SqrPlanarDistance(self,other) <= sqrDistance;
         }
         public static bool IsPlanarAngleWithin(this Vector3 self, Vector3 other, float tolerance)
         {
