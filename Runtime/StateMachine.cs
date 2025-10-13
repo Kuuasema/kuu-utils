@@ -115,11 +115,8 @@ namespace Kuuasema.Utils {
         }
 
         public bool IsStatePushing { get; private set; }
-        public bool IsStateInserting { get; private set; }
         public bool IsStatePopping { get; private set; }
         public T NextState { get; private set; }
-        public T InsertingState { get; private set; }
-        public int InsertingStateIndex { get; private set; }
 
         /**
         * States can be pushed on top of each other.
@@ -166,55 +163,18 @@ namespace Kuuasema.Utils {
 
         /**
         * States can be inserted into the list.
-        * 09.09.2025 Jakub, added this to enable queueing states
+        * 09.09.2025 Jakub, added this to enable queueing states in the middle of the stack
         */
-        private void InsertState(T _state, int index)
+        public bool TryInsertState(T _state, int index)
         {
-            if (this.inUpdate)
-            {
-                this.InsertStateDeferred(_state, index);
-                return;
-            }
-            this.IsStateInserting = true;
-            this.InsertingState = _state;
+            if (index == this.StateStack.Count) return TryPushState(_state);
             this.StateStack.Insert(index, _state);
             State state = this.StateMap[_state];
             if (!state.Initialized)
             {
                 state.Initialize();
             }
-            this.IsStateInserting = false;
-            if (StateStack.Count-1 <= index)
-            {
-                state.OnStateEnter();
-            }
-        }
-
-        public bool TryInsertState(T _state, int index)
-        {
-            if (this.IsStateInserting)
-            {
-                if (EqualityComparer<T>.Default.Equals(this.InsertingState, _state))
-                {
-                    Debug.LogWarning($"TryInsertState({_state}) while: IsStateInserting = {this.IsStateInserting}, InsertingState = {this.InsertingState}, InsertingStateIndex = {this.InsertingStateIndex})");
-                }
-                else
-                {
-                    Debug.LogError($"TryInsertState({_state}) while: IsStateInserting = {this.IsStateInserting}, InsertingState = {this.InsertingState}, InsertingStateIndex = {this.InsertingStateIndex})");
-                }
-                return false;
-            }
-
-            this.InsertStateDeferred(_state, index);
             return true;
-        }
-
-        public void InsertStateDeferred(T _state, int index)
-        {
-            this.IsStateInserting = true;
-            this.InsertingState = _state;
-            this.InsertingStateIndex = index;
-            ScheduledUpdater.RequestLateUpdate(() => this.InsertState(_state, index));
         }
 
         /**
