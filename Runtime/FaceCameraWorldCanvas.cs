@@ -4,7 +4,6 @@ using UnityEngine;
 namespace Kuuasema.Utils {
     [RequireComponent(typeof(Canvas))]
     public class FaceCameraWorldCanvas : MonoBehaviour {
-        public bool FixedUp;
         private Canvas worldCanvas;
         private Vector3 startPosition;
         private void Start() {
@@ -17,11 +16,7 @@ namespace Kuuasema.Utils {
 
         private void Update() {
             this.transform.localPosition = Quaternion.Inverse(this.transform.parent.localRotation) * this.startPosition;
-            this.transform.LookAt(this.worldCanvas.worldCamera.transform);
-            this.transform.rotation *= Quaternion.Euler(0, 180, 0);
-            if (this.FixedUp) {
-                this.transform.rotation = Quaternion.LookRotation(Vector3.ProjectOnPlane(this.transform.forward.normalized, Vector3.up));
-            }
+            this.transform.forward = this.worldCanvas.worldCamera.transform.forward;
         }
     }
 }
