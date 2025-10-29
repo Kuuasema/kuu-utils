@@ -221,18 +221,18 @@ namespace Kuuasema.Utils {
         /**
         * Clear to state will clear the state stack (and queue) and begin from the given new state
         */
-        public void ClearToState(T state) {
+        public bool ClearToState(T state) {
             if (this.IsStatePushing || this.IsStatePopping) {
                 if (this.NextState.Equals(state) || this.StateStack[0].Equals(state)) {
                     // harmless attempt to change state into what it is currently changing to or already cleared to
-                    return;
+                    return false;
                 }
                 Debug.LogError($"Cannot clear to state {state} while already: pushing = {this.IsStatePushing}, popping = {this.IsStatePopping}, next state = {this.NextState}");
-                return;
+                return false;
             }
             if (this.inUpdate) {
                 this.ClearToStateDeferred(state);
-                return;
+                return true;
             }
             for (int i = this.StateStack.Count - 1; i >= 0; i--) {
                 this.StateMap[this.StateStack[i]].OnStateExit();
@@ -242,6 +242,7 @@ namespace Kuuasema.Utils {
             // which leads to undefined state flow
             this.StateQueue.Clear();
             this.PushState(state);
+            return true;
         }
 
         public void ClearToStateDeferred(T state) {
