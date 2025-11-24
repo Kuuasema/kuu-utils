@@ -14,12 +14,15 @@ namespace Kuuasema.Utils {
             return true;
         }
 
-        private static List<Action> updates = new List<Action>();
-        private static List<Action> lateUpdates = new List<Action>();
-        private static List<Action> fixedUpdates = new List<Action>();
-        private static List<Action> continuousUpdates = new List<Action>();
-        private static List<Action> continuousLateUpdates = new List<Action>();
-        private static List<Action> continuousFixedUpdates = new List<Action>();
+        private static Dictionary<int, List<Action>> updates = new Dictionary<int, List<Action>>();
+        private static Dictionary<int, List<Action>> lateUpdates = new Dictionary<int, List<Action>>();
+        private static Dictionary<int, List<Action>> fixedUpdates = new Dictionary<int, List<Action>>();
+        private static Dictionary<int, List<Action>> continuousUpdates = new Dictionary<int, List<Action>>();
+        private static Dictionary<int, List<Action>> continuousLateUpdates = new Dictionary<int, List<Action>>();
+        private static Dictionary<int, List<Action>> continuousFixedUpdates = new Dictionary<int, List<Action>>();
+        private static int highestIndex = -1;
+        private static int highestIndexLate = -1;
+        private static int highestIndexFixed = -1;
 
         private void OnApplicationQuit() {
             quitting = true;
@@ -32,82 +35,97 @@ namespace Kuuasema.Utils {
             instance.StartCoroutine(coroutine);
         }
 
-        public static void RequestUpdate(Action action) {
+        public static void RequestUpdate(Action action, int index = 0) {
             if (instance == null) {
                 if (!Create()) return;
             }
+            highestIndex = Mathf.Max(highestIndex, index);
             if (InUpdate) {
                 // dont alter the main collections while inside the update
-                addActions.Add(action);
+                if (addActions[index] == null) addActions.Add(index, new List<Action>());
+                addActions[index].Add(action);
                 return;
             }
             if (!instance.enabled) instance.enabled = true;
-            if (!updates.Contains(action)) {
-                updates.Add(action);
+            if (updates[index] == null) updates.Add(index, new List<Action>());
+            if (!updates[index].Contains(action)) {
+                updates[index].Add(action);
             }
         }
 
-        public static void RequestLateUpdate(Action action) {
+        public static void RequestLateUpdate(Action action, int index = 0) {
             if (instance == null) {
                 if (!Create()) return;
             }
+            highestIndexLate = Mathf.Max(highestIndexLate, index);
             if (InLateUpdate) {
                 // dont alter the main collections while inside the update
-                addActions.Add(action);
+                if (addLateActions[index] == null) addLateActions.Add(index, new List<Action>());
+                addLateActions[index].Add(action);
                 return;
             }
             if (!instance.enabled) instance.enabled = true;
-            if (!lateUpdates.Contains(action)) {
-                lateUpdates.Add(action);
+            if (lateUpdates[index] == null) lateUpdates.Add(index, new List<Action>());
+            if (!lateUpdates[index].Contains(action)) {
+                lateUpdates[index].Add(action);
             }
         }
 
-        public static void RequestFixedUpdate(Action action) {
+        public static void RequestFixedUpdate(Action action, int index = 0) {
             if (instance == null) {
                 if (!Create()) return;
             }
+            highestIndexFixed = Mathf.Max(highestIndexFixed, index);
             if (InFixedUpdate) {
                 // dont alter the main collections while inside the update
-                addActions.Add(action);
+                if (addFixedActions[index] == null) addFixedActions.Add(index, new List<Action>());
+                addFixedActions[index].Add(action);
                 return;
             }
             if (!instance.enabled) instance.enabled = true;
-            if (!fixedUpdates.Contains(action)) {
-                fixedUpdates.Add(action);
+            if (fixedUpdates[index] == null) fixedUpdates.Add(index, new List<Action>());
+            if (!fixedUpdates[index].Contains(action)) {
+                fixedUpdates[index].Add(action);
             }
         }
 
-        public static void RequestContinuousUpdate(Action action) {
+        public static void RequestContinuousUpdate(Action action, int index = 0) {
             if (instance == null) {
                 if (!Create()) return;
             }
+            highestIndex = Mathf.Max(highestIndex, index);
             if (InUpdate) {
                 // dont alter the main collections while inside the update
-                addContinuousActions.Add(action);
+                if (addContinuousActions[index] == null) addContinuousActions.Add(index, new List<Action>());
+                addContinuousActions[index].Add(action);
                 return;
             }
             if (!instance.enabled) instance.enabled = true;
-            if (!continuousUpdates.Contains(action)) {
-                continuousUpdates.Add(action);
+            if (continuousUpdates[index] == null) continuousUpdates.Add(index, new List<Action>());
+            if (!continuousUpdates[index].Contains(action)) {
+                continuousUpdates[index].Add(action);
             }
         }
 
-        public static void RequestContinuousLateUpdate(Action action) {
+        public static void RequestContinuousLateUpdate(Action action, int index = 0) {
             if (instance == null) {
                 if (!Create()) return;
             }
+            highestIndexLate = Mathf.Max(highestIndexLate, index);
             if (InLateUpdate) {
                 // dont alter the main collections while inside the update
-                addContinuousActions.Add(action);
+                if (addContinuousLateActions[index] == null) addContinuousLateActions.Add(index, new List<Action>());
+                addContinuousLateActions[index].Add(action);
                 return;
             }
             if (!instance.enabled) instance.enabled = true;
-            if (!continuousLateUpdates.Contains(action)) {
-                continuousLateUpdates.Add(action);
+            if (continuousLateUpdates[index] == null) continuousLateUpdates.Add(index, new List<Action>());
+            if (!continuousLateUpdates[index].Contains(action)) {
+                continuousLateUpdates[index].Add(action);
             }
         }
 
-        public static void RequestContinuousFixedUpdate(Action action) {
+        public static void RequestContinuousFixedUpdate(Action action, int index = 0) {
             #if UNITY_EDITOR
             if (!Application.isPlaying) {
                 return;
@@ -116,14 +134,17 @@ namespace Kuuasema.Utils {
             if (instance == null) {
                 if (!Create()) return;
             }
+            highestIndexFixed = Mathf.Max(highestIndexFixed, index);
             if (InFixedUpdate) {
                 // dont alter the main collections while inside the update
-                addContinuousActions.Add(action);
+                if (addContinuousFixedActions[index] == null) addContinuousFixedActions.Add(index, new List<Action>());
+                addContinuousFixedActions[index].Add(action);
                 return;
             }
             if (!instance.enabled) instance.enabled = true;
-            if (!continuousFixedUpdates.Contains(action)) {
-                continuousFixedUpdates.Add(action);
+            if (continuousFixedUpdates[index] == null) continuousFixedUpdates.Add(index, new List<Action>());
+            if (!continuousFixedUpdates[index].Contains(action)) {
+                continuousFixedUpdates[index].Add(action);
             }
         }
 
@@ -131,15 +152,9 @@ namespace Kuuasema.Utils {
             if (instance == null) {
                 if (!Create()) return;
             }
-            if (InUpdate) {
-                // dont alter the main collections while inside the update
-                if (!removeActions.Contains(action)) {
-                    removeActions.Add(action);
-                }
-                return;
-            }
-            if (continuousUpdates.Contains(action)) {
-                continuousUpdates.Remove(action);
+            if (!removeActions.Contains(action))
+            {
+                removeActions.Add(action);
             }
         }
 
@@ -147,15 +162,9 @@ namespace Kuuasema.Utils {
             if (instance == null) {
                 if (!Create()) return;
             }
-            if (InLateUpdate) {
-                // dont alter the main collections while inside the update
-                if (!removeActions.Contains(action)) {
-                    removeActions.Add(action);
-                }
-                return;
-            }
-            if (continuousLateUpdates.Contains(action)) {
-                continuousLateUpdates.Remove(action);
+            if (!removeLateActions.Contains(action))
+            {
+                removeLateActions.Add(action);
             }
         }
 
@@ -163,126 +172,239 @@ namespace Kuuasema.Utils {
             if (instance == null) {
                 if (!Create()) return;
             }
-            if (InFixedUpdate) {
-                // dont alter the main collections while inside the update
-                if (!removeActions.Contains(action)) {
-                    removeActions.Add(action);
-                }
-                return;
-            }
-            if (continuousFixedUpdates.Contains(action)) {
-                continuousFixedUpdates.Remove(action);
+            if (!removeFixedActions.Contains(action))
+            {
+                removeFixedActions.Add(action);
             }
         }
 
         // prevent adding and removing actions from the collections while 
         // iterating them, these lists can accumulate add/remove actions
-        // to be processed at the end of each respective update method
+        // to be processed at the start of each respective update method
         public static bool InUpdate { get; private set; }
         public static bool InLateUpdate { get; private set; }
         public static bool InFixedUpdate { get; private set; }
         private static List<Action> removeActions = new List<Action>();
-        private static List<Action> addActions = new List<Action>();
-        private static List<Action> addContinuousActions = new List<Action>();
+        private static List<Action> removeLateActions = new List<Action>();
+        private static List<Action> removeFixedActions = new List<Action>();
+        private static Dictionary<int, List<Action>> addActions = new Dictionary<int, List<Action>>();
+        private static Dictionary<int, List<Action>> addLateActions = new Dictionary<int, List<Action>>();
+        private static Dictionary<int, List<Action>> addFixedActions = new Dictionary<int, List<Action>>();
+        private static Dictionary<int, List<Action>> addContinuousActions = new Dictionary<int, List<Action>>();
+        private static Dictionary<int, List<Action>> addContinuousLateActions = new Dictionary<int, List<Action>>();
+        private static Dictionary<int, List<Action>> addContinuousFixedActions = new Dictionary<int, List<Action>>();
 
         private void Update() {
             InUpdate = true;
-            foreach (Action action in continuousUpdates) {
-                action();
-            }
-            foreach (Action action in updates) {
-                action();
-            }
-            updates.Clear();
             // remove and add actions that were requested 
             // while iterating the actions above
             if (removeActions.Count > 0) {
-                foreach (Action action in removeActions) {
-                    continuousUpdates.Remove(action);
-                    updates.Remove(action);
+                foreach (Action action in removeActions)
+                {
+                    int index = -1;
+                    for (int i = 0; i <= highestIndex; i++)
+                    {
+                        if (continuousUpdates[i] != null && continuousUpdates[i].Count > 0)
+                        {
+                            continuousUpdates[i].Remove(action);
+                            if (continuousUpdates[i].Count > 0) index = i;
+                        }
+                        if (updates[i] != null && updates[i].Count > 0)
+                        {
+                            updates[i].Remove(action);
+                            if (updates[i].Count > 0) index = i;
+                        }
+                    }
+                    highestIndex = index;
                 }
                 removeActions.Clear();
             }
             if (addActions.Count > 0) {
-                foreach (Action action in addActions) {
-                    action();
+                foreach (KeyValuePair<int, List<Action>> kvp in addActions)
+                {
+                    highestIndex = Mathf.Max(highestIndex, kvp.Key);
+                    if (updates.ContainsKey(kvp.Key))
+                    {
+                        updates[kvp.Key].AddRange(kvp.Value);
+                    }
+                    else updates.Add(kvp.Key, kvp.Value);
                 }
                 addActions.Clear();
             }
-            if (addContinuousActions.Count > 0) {
-                foreach (Action action in addContinuousActions) {
-                    continuousUpdates.Add(action);
+            if (addContinuousActions.Count > 0)
+            {
+                foreach (KeyValuePair<int, List<Action>> kvp in addContinuousActions)
+                {
+                    highestIndex = Mathf.Max(highestIndex, kvp.Key);
+                    if (continuousUpdates.ContainsKey(kvp.Key))
+                    {
+                        continuousUpdates[kvp.Key].AddRange(kvp.Value);
+                    }
+                    else continuousUpdates.Add(kvp.Key, kvp.Value);
                 }
                 addContinuousActions.Clear();
             }
+            for (int i = 0; i <= highestIndex; i++)
+            {
+                if (continuousUpdates[i] != null)
+                {
+                    foreach (Action action in continuousUpdates[i])
+                    {
+                        action();
+                    }
+                }
+                if (updates[i] != null)
+                {
+                    foreach (Action action in updates[i])
+                    {
+                        action();
+                    }
+                }
+            }
+            updates.Clear();
             InUpdate = false;
         }
 
         private void LateUpdate() {
             InLateUpdate = true;
-            foreach (Action action in continuousLateUpdates) {
-                action();
-            }
-            foreach (Action action in lateUpdates) {
-                action();
-            }
-            lateUpdates.Clear();
-            instance.enabled = continuousUpdates.Count > 0 || continuousLateUpdates.Count > 0 || continuousFixedUpdates.Count > 0;
-            // remove and add actions that were requested 
-            // while iterating the actions above
-            if (removeActions.Count > 0) {
-                foreach (Action action in removeActions) {
-                    continuousLateUpdates.Remove(action);
-                    lateUpdates.Remove(action);
+            if (removeActions.Count > 0)
+            {
+                foreach (Action action in removeActions)
+                {
+                    int index = -1;
+                    for (int i = 0; i <= highestIndexLate; i++)
+                    {
+                        if (continuousLateUpdates[i] != null && continuousLateUpdates[i].Count > 0)
+                        {
+                            continuousLateUpdates[i].Remove(action);
+                            if (continuousLateUpdates[i].Count > 0) index = i;
+                        }
+                        if (lateUpdates[i] != null && lateUpdates[i].Count > 0)
+                        {
+                            lateUpdates[i].Remove(action);
+                            if (lateUpdates[i].Count > 0) index = i;
+                        }
+                    }
+                    highestIndexLate = index;
                 }
                 removeActions.Clear();
             }
-            if (addActions.Count > 0) {
-                foreach (Action action in addActions) {
-                    action();
+            if (addLateActions.Count > 0)
+            {
+                foreach (KeyValuePair<int, List<Action>> kvp in addLateActions)
+                {
+                    highestIndexLate = Mathf.Max(highestIndexLate, kvp.Key);
+                    if (lateUpdates.ContainsKey(kvp.Key))
+                    {
+                        lateUpdates[kvp.Key].AddRange(kvp.Value);
+                    }
+                    else lateUpdates.Add(kvp.Key, kvp.Value);
                 }
-                addActions.Clear();
+                addLateActions.Clear();
             }
-            if (addContinuousActions.Count > 0) {
-                foreach (Action action in addContinuousActions) {
-                    continuousLateUpdates.Add(action);
+            if (addContinuousLateActions.Count > 0)
+            {
+                foreach (KeyValuePair<int, List<Action>> kvp in addContinuousLateActions)
+                {
+                    highestIndexLate = Mathf.Max(highestIndexLate, kvp.Key);
+                    if (continuousLateUpdates.ContainsKey(kvp.Key))
+                    {
+                        continuousLateUpdates[kvp.Key].AddRange(kvp.Value);
+                    }
+                    else continuousLateUpdates.Add(kvp.Key, kvp.Value);
                 }
-                addContinuousActions.Clear();
+                addContinuousLateActions.Clear();
             }
+            for (int i = 0; i <= highestIndexLate; i++)
+            {
+                if (continuousLateUpdates[i] != null)
+                {
+                    foreach (Action action in continuousLateUpdates[i])
+                    {
+                        action();
+                    }
+                }
+                if (lateUpdates[i] != null)
+                {
+                    foreach (Action action in lateUpdates[i])
+                    {
+                        action();
+                    }
+                }
+            }
+            lateUpdates.Clear();
             InLateUpdate = false;
         }
 
-        private void FixedUpdate() {
+        private void FixedUpdate()
+        {
             InFixedUpdate = true;
-            foreach (Action action in continuousFixedUpdates) {
-                action();
-            }
-            foreach (Action action in fixedUpdates) {
-                action();
-            }
-            fixedUpdates.Clear();
-            instance.enabled = continuousUpdates.Count > 0 || continuousLateUpdates.Count > 0 || continuousFixedUpdates.Count > 0;
-            // remove and add actions that were requested 
-            // while iterating the actions above
-            if (removeActions.Count > 0) {
-                foreach (Action action in removeActions) {
-                    continuousFixedUpdates.Remove(action);
-                    fixedUpdates.Remove(action);
+            if (removeActions.Count > 0)
+            {
+                foreach (Action action in removeActions)
+                {
+                    int index = -1;
+                    for (int i = 0; i <= highestIndexFixed; i++)
+                    {
+                        if (continuousFixedUpdates[i] != null && continuousFixedUpdates[i].Count > 0)
+                        {
+                            continuousFixedUpdates[i].Remove(action);
+                            if (continuousFixedUpdates[i].Count > 0) index = i;
+                        }
+                        if (fixedUpdates[i] != null && fixedUpdates[i].Count > 0)
+                        {
+                            fixedUpdates[i].Remove(action);
+                            if (fixedUpdates[i].Count > 0) index = i;
+                        }
+                    }
+                    highestIndexFixed = index;
                 }
                 removeActions.Clear();
             }
-            if (addActions.Count > 0) {
-                foreach (Action action in addActions) {
-                    action();
+            if (addFixedActions.Count > 0)
+            {
+                foreach (KeyValuePair<int, List<Action>> kvp in addFixedActions)
+                {
+                    highestIndexFixed = Mathf.Max(highestIndexFixed, kvp.Key);
+                    if (fixedUpdates.ContainsKey(kvp.Key))
+                    {
+                        fixedUpdates[kvp.Key].AddRange(kvp.Value);
+                    }
+                    else fixedUpdates.Add(kvp.Key, kvp.Value);
                 }
-                addActions.Clear();
+                addFixedActions.Clear();
             }
-            if (addContinuousActions.Count > 0) {
-                foreach (Action action in addContinuousActions) {
-                    continuousFixedUpdates.Add(action);
+            if (addContinuousFixedActions.Count > 0)
+            {
+                foreach (KeyValuePair<int, List<Action>> kvp in addContinuousFixedActions)
+                {
+                    highestIndexFixed = Mathf.Max(highestIndexFixed, kvp.Key);
+                    if (continuousFixedUpdates.ContainsKey(kvp.Key))
+                    {
+                        continuousFixedUpdates[kvp.Key].AddRange(kvp.Value);
+                    }
+                    else continuousFixedUpdates.Add(kvp.Key, kvp.Value);
                 }
-                addContinuousActions.Clear();
+                addContinuousFixedActions.Clear();
             }
+            for (int i = 0; i <= highestIndexFixed; i++)
+            {
+                if (continuousFixedUpdates[i] != null)
+                {
+                    foreach (Action action in continuousFixedUpdates[i])
+                    {
+                        action();
+                    }
+                }
+                if (fixedUpdates[i] != null)
+                {
+                    foreach (Action action in fixedUpdates[i])
+                    {
+                        action();
+                    }
+                }
+            }
+            fixedUpdates.Clear();
             InFixedUpdate = false;
         }
     }
