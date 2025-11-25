@@ -3,11 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Kuuasema.Utils {
-    public class ScheduledUpdater : MonoBehaviour {
+namespace Kuuasema.Utils
+{
+    public class ScheduledUpdater : MonoBehaviour
+    {
         private static ScheduledUpdater instance;
         private static bool quitting;
-        private static bool Create() {
+        private static bool Create()
+        {
             if (quitting) return false;
             instance = new GameObject("ScheduledUpdater").AddComponent<ScheduledUpdater>();
             DontDestroyOnLoad(instance.gameObject);
@@ -24,23 +27,29 @@ namespace Kuuasema.Utils {
         private static int highestIndexLate = -1;
         private static int highestIndexFixed = -1;
 
-        private void OnApplicationQuit() {
+        private void OnApplicationQuit()
+        {
             quitting = true;
         }
 
-        public static void RunCoroutine(IEnumerator coroutine) {
-            if (instance == null) {
+        public static void RunCoroutine(IEnumerator coroutine)
+        {
+            if (instance == null)
+            {
                 if (!Create()) return;
             }
             instance.StartCoroutine(coroutine);
         }
 
-        public static void RequestUpdate(Action action, int index = 0) {
-            if (instance == null) {
+        public static void RequestUpdate(Action action, int index = 0)
+        {
+            if (instance == null)
+            {
                 if (!Create()) return;
             }
             highestIndex = Mathf.Max(highestIndex, index);
-            if (InUpdate) {
+            if (InUpdate)
+            {
                 // dont alter the main collections while inside the update
                 if (!addActions.ContainsKey(index) || addActions[index] == null) addActions.Add(index, new List<Action>());
                 addActions[index].Add(action);
@@ -48,17 +57,21 @@ namespace Kuuasema.Utils {
             }
             if (!instance.enabled) instance.enabled = true;
             if (!updates.ContainsKey(index) || updates[index] == null) updates.Add(index, new List<Action>());
-            if (!updates[index].Contains(action)) {
+            if (!updates[index].Contains(action))
+            {
                 updates[index].Add(action);
             }
         }
 
-        public static void RequestLateUpdate(Action action, int index = 0) {
-            if (instance == null) {
+        public static void RequestLateUpdate(Action action, int index = 0)
+        {
+            if (instance == null)
+            {
                 if (!Create()) return;
             }
             highestIndexLate = Mathf.Max(highestIndexLate, index);
-            if (InLateUpdate) {
+            if (InLateUpdate)
+            {
                 // dont alter the main collections while inside the update
                 if (!addLateActions.ContainsKey(index) || addLateActions[index] == null) addLateActions.Add(index, new List<Action>());
                 addLateActions[index].Add(action);
@@ -66,17 +79,21 @@ namespace Kuuasema.Utils {
             }
             if (!instance.enabled) instance.enabled = true;
             if (!lateUpdates.ContainsKey(index) || lateUpdates[index] == null) lateUpdates.Add(index, new List<Action>());
-            if (!lateUpdates[index].Contains(action)) {
+            if (!lateUpdates[index].Contains(action))
+            {
                 lateUpdates[index].Add(action);
             }
         }
 
-        public static void RequestFixedUpdate(Action action, int index = 0) {
-            if (instance == null) {
+        public static void RequestFixedUpdate(Action action, int index = 0)
+        {
+            if (instance == null)
+            {
                 if (!Create()) return;
             }
             highestIndexFixed = Mathf.Max(highestIndexFixed, index);
-            if (InFixedUpdate) {
+            if (InFixedUpdate)
+            {
                 // dont alter the main collections while inside the update
                 if (!addFixedActions.ContainsKey(index) || addFixedActions[index] == null) addFixedActions.Add(index, new List<Action>());
                 addFixedActions[index].Add(action);
@@ -84,17 +101,21 @@ namespace Kuuasema.Utils {
             }
             if (!instance.enabled) instance.enabled = true;
             if (!fixedUpdates.ContainsKey(index) || fixedUpdates[index] == null) fixedUpdates.Add(index, new List<Action>());
-            if (!fixedUpdates[index].Contains(action)) {
+            if (!fixedUpdates[index].Contains(action))
+            {
                 fixedUpdates[index].Add(action);
             }
         }
 
-        public static void RequestContinuousUpdate(Action action, int index = 0) {
-            if (instance == null) {
+        public static void RequestContinuousUpdate(Action action, int index = 0)
+        {
+            if (instance == null)
+            {
                 if (!Create()) return;
             }
             highestIndex = Mathf.Max(highestIndex, index);
-            if (InUpdate) {
+            if (InUpdate)
+            {
                 // dont alter the main collections while inside the update
                 if (!addContinuousActions.ContainsKey(index) || addContinuousActions[index] == null) addContinuousActions.Add(index, new List<Action>());
                 addContinuousActions[index].Add(action);
@@ -102,17 +123,21 @@ namespace Kuuasema.Utils {
             }
             if (!instance.enabled) instance.enabled = true;
             if (!continuousUpdates.ContainsKey(index) || continuousUpdates[index] == null) continuousUpdates.Add(index, new List<Action>());
-            if (!continuousUpdates[index].Contains(action)) {
+            if (!continuousUpdates[index].Contains(action))
+            {
                 continuousUpdates[index].Add(action);
             }
         }
 
-        public static void RequestContinuousLateUpdate(Action action, int index = 0) {
-            if (instance == null) {
+        public static void RequestContinuousLateUpdate(Action action, int index = 0)
+        {
+            if (instance == null)
+            {
                 if (!Create()) return;
             }
             highestIndexLate = Mathf.Max(highestIndexLate, index);
-            if (InLateUpdate) {
+            if (InLateUpdate)
+            {
                 // dont alter the main collections while inside the update
                 if (!addContinuousLateActions.ContainsKey(index) || addContinuousLateActions[index] == null) addContinuousLateActions.Add(index, new List<Action>());
                 addContinuousLateActions[index].Add(action);
@@ -120,22 +145,27 @@ namespace Kuuasema.Utils {
             }
             if (!instance.enabled) instance.enabled = true;
             if (!continuousLateUpdates.ContainsKey(index) || continuousLateUpdates[index] == null) continuousLateUpdates.Add(index, new List<Action>());
-            if (!continuousLateUpdates[index].Contains(action)) {
+            if (!continuousLateUpdates[index].Contains(action))
+            {
                 continuousLateUpdates[index].Add(action);
             }
         }
 
-        public static void RequestContinuousFixedUpdate(Action action, int index = 0) {
-            #if UNITY_EDITOR
-            if (!Application.isPlaying) {
+        public static void RequestContinuousFixedUpdate(Action action, int index = 0)
+        {
+#if UNITY_EDITOR
+            if (!Application.isPlaying)
+            {
                 return;
             }
-            #endif
-            if (instance == null) {
+#endif
+            if (instance == null)
+            {
                 if (!Create()) return;
             }
             highestIndexFixed = Mathf.Max(highestIndexFixed, index);
-            if (InFixedUpdate) {
+            if (InFixedUpdate)
+            {
                 // dont alter the main collections while inside the update
                 if (!addContinuousFixedActions.ContainsKey(index) || addContinuousFixedActions[index] == null) addContinuousFixedActions.Add(index, new List<Action>());
                 addContinuousFixedActions[index].Add(action);
@@ -143,13 +173,16 @@ namespace Kuuasema.Utils {
             }
             if (!instance.enabled) instance.enabled = true;
             if (!continuousFixedUpdates.ContainsKey(index) || continuousFixedUpdates[index] == null) continuousFixedUpdates.Add(index, new List<Action>());
-            if (!continuousFixedUpdates[index].Contains(action)) {
+            if (!continuousFixedUpdates[index].Contains(action))
+            {
                 continuousFixedUpdates[index].Add(action);
             }
         }
 
-        public static void CancelContinuousUpdate(Action action) {
-            if (instance == null) {
+        public static void CancelContinuousUpdate(Action action)
+        {
+            if (instance == null)
+            {
                 if (!Create()) return;
             }
             if (!removeActions.Contains(action))
@@ -158,8 +191,10 @@ namespace Kuuasema.Utils {
             }
         }
 
-        public static void CancelContinuousLateUpdate(Action action) {
-            if (instance == null) {
+        public static void CancelContinuousLateUpdate(Action action)
+        {
+            if (instance == null)
+            {
                 if (!Create()) return;
             }
             if (!removeLateActions.Contains(action))
@@ -168,8 +203,10 @@ namespace Kuuasema.Utils {
             }
         }
 
-        public static void CancelContinuousFixedUpdate(Action action) {
-            if (instance == null) {
+        public static void CancelContinuousFixedUpdate(Action action)
+        {
+            if (instance == null)
+            {
                 if (!Create()) return;
             }
             if (!removeFixedActions.Contains(action))
@@ -181,9 +218,9 @@ namespace Kuuasema.Utils {
         // prevent adding and removing actions from the collections while 
         // iterating them, these lists can accumulate add/remove actions
         // to be processed at the start of each respective update method
-        public static bool InUpdate { get; private set; }
-        public static bool InLateUpdate { get; private set; }
-        public static bool InFixedUpdate { get; private set; }
+        public static bool InUpdate { get; private set; }
+        public static bool InLateUpdate { get; private set; }
+        public static bool InFixedUpdate { get; private set; }
         private static List<Action> removeActions = new List<Action>();
         private static List<Action> removeLateActions = new List<Action>();
         private static List<Action> removeFixedActions = new List<Action>();
@@ -194,15 +231,17 @@ namespace Kuuasema.Utils {
         private static Dictionary<int, List<Action>> addContinuousLateActions = new Dictionary<int, List<Action>>();
         private static Dictionary<int, List<Action>> addContinuousFixedActions = new Dictionary<int, List<Action>>();
 
-        private void Update() {
+        private void Update()
+        {
             InUpdate = true;
             // remove and add actions that were requested 
             // while iterating the actions above
-            if (removeActions.Count > 0) {
-                foreach (Action action in removeActions)
+            if (removeActions.Count > 0)
+            {
+                int index = -1;
+                for (int i = 0; i <= highestIndex; i++)
                 {
-                    int index = -1;
-                    for (int i = 0; i <= highestIndex; i++)
+                    foreach (Action action in removeActions)
                     {
                         if (continuousUpdates.ContainsKey(i))
                         {
@@ -217,11 +256,12 @@ namespace Kuuasema.Utils {
                             else updates.Remove(i);
                         }
                     }
-                    highestIndex = index;
                 }
+                highestIndex = index;
                 removeActions.Clear();
             }
-            if (addActions.Count > 0) {
+            if (addActions.Count > 0)
+            {
                 foreach (KeyValuePair<int, List<Action>> kvp in addActions)
                 {
                     highestIndex = Mathf.Max(highestIndex, kvp.Key);
@@ -267,14 +307,15 @@ namespace Kuuasema.Utils {
             InUpdate = false;
         }
 
-        private void LateUpdate() {
+        private void LateUpdate()
+        {
             InLateUpdate = true;
-            if (removeActions.Count > 0)
+            if (removeLateActions.Count > 0)
             {
-                foreach (Action action in removeActions)
+                int index = -1;
+                for (int i = 0; i <= highestIndex; i++)
                 {
-                    int index = -1;
-                    for (int i = 0; i <= highestIndexLate; i++)
+                    foreach (Action action in removeLateActions)
                     {
                         if (continuousLateUpdates.ContainsKey(i))
                         {
@@ -289,8 +330,8 @@ namespace Kuuasema.Utils {
                             else lateUpdates.Remove(i);
                         }
                     }
-                    highestIndexLate = index;
                 }
+                highestIndexLate = index;
                 removeActions.Clear();
             }
             if (addLateActions.Count > 0)
@@ -343,12 +384,12 @@ namespace Kuuasema.Utils {
         private void FixedUpdate()
         {
             InFixedUpdate = true;
-            if (removeActions.Count > 0)
+            if (removeFixedActions.Count > 0)
             {
-                foreach (Action action in removeActions)
+                int index = -1;
+                for (int i = 0; i <= highestIndex; i++)
                 {
-                    int index = -1;
-                    for (int i = 0; i <= highestIndexFixed; i++)
+                    foreach (Action action in removeFixedActions)
                     {
                         if (continuousFixedUpdates.ContainsKey(i))
                         {
@@ -363,8 +404,8 @@ namespace Kuuasema.Utils {
                             else fixedUpdates.Remove(i);
                         }
                     }
-                    highestIndexFixed = index;
                 }
+                highestIndexFixed = index;
                 removeActions.Clear();
             }
             if (addFixedActions.Count > 0)
