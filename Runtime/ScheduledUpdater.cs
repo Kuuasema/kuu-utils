@@ -185,7 +185,14 @@ namespace Kuuasema.Utils
             {
                 if (!Create()) return;
             }
-            if (!removeActions.Contains(action))
+            if (!InUpdate)
+            {
+                foreach(List<Action> list in continuousUpdates.Values)
+                {
+                    if (list.Contains(action)) list.Remove(action);
+                }
+            }
+            else if (!removeActions.Contains(action))
             {
                 removeActions.Add(action);
             }
@@ -197,7 +204,14 @@ namespace Kuuasema.Utils
             {
                 if (!Create()) return;
             }
-            if (!removeLateActions.Contains(action))
+            if (!InLateUpdate)
+            {
+                foreach (List<Action> list in continuousLateUpdates.Values)
+                {
+                    if (list.Contains(action)) list.Remove(action);
+                }
+            }
+            else if (!removeLateActions.Contains(action))
             {
                 removeLateActions.Add(action);
             }
@@ -209,7 +223,14 @@ namespace Kuuasema.Utils
             {
                 if (!Create()) return;
             }
-            if (!removeFixedActions.Contains(action))
+            if (!InFixedUpdate)
+            {
+                foreach (List<Action> list in continuousFixedUpdates.Values)
+                {
+                    if (list.Contains(action)) list.Remove(action);
+                }
+            }
+            else if (!removeFixedActions.Contains(action))
             {
                 removeFixedActions.Add(action);
             }
