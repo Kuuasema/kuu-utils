@@ -94,7 +94,7 @@ namespace Kuuasema.Utils
 
             public void Raycast(bool doHUDCheck)
             {
-                if (GameCamera.Instance != null)
+                if (Camera.main != null)
                 {
                     this.Ray = GameCamera.Camera.ScreenPointToRay(this.ScreenPosition);
                     int hits = Physics.RaycastNonAlloc(this.Ray, this.HitsAll);
