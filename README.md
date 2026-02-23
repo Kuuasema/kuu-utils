@@ -348,3 +348,4 @@ TextUtils.PadCapitalizedString("myString"); --> "my String"
 TextUtils.PadCapitalizedString("myString", true); --> "My String"
 ```
 
+

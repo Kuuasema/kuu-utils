@@ -14,14 +14,13 @@ namespace Kuuasema.Utils
         public static Camera Camera => instance?.GameCam;
 
 
+        private Camera _gameCam;
+
         private Camera GameCam
         {
             get
             {
-                if (TryGetComponent<Camera>(out var cam))
-                {
-                    return cam;
-                }
+                if (_gameCam != null || TryGetComponent(out _gameCam)) return _gameCam;
 
                 return Camera.main;
             }
