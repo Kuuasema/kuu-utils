@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using UnityEngine.EventSystems;
 
 namespace Kuuasema.Utils
 {
@@ -120,14 +121,20 @@ namespace Kuuasema.Utils
                 if (doHUDCheck && HUDCamera.Instance != null)
                 {
                     bool isOverHUDThisFrame = false;
-                    this.Ray = HUDCamera.Camera.ScreenPointToRay(this.ScreenPosition);
+
+
+                    //this check below is useless
+                    /*this.Ray = HUDCamera.Camera.ScreenPointToRay(this.ScreenPosition);
                     int hitsHUD = Physics.RaycastNonAlloc(this.Ray, this.HitsHUD);
 
                     for (int i = 0; !isOverHUDThisFrame && i < hitsHUD; i++)
                     {
                         int hitLayer = 1 << HitsHUD[i].collider.gameObject.layer;
                         isOverHUDThisFrame = (this.raycaster.hudBlockerLayer & hitLayer) != 0;
-                    }
+                    }*/
+
+                    //replaced with something that actually works
+                    isOverHUDThisFrame = EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
 
                     InputRaycaster.IsOverHUD = isOverHUDThisFrame;
                 }
