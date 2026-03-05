@@ -12,6 +12,7 @@ namespace Kuuasema.Utils {
 
         public static readonly int VISIBLE_LAYER = LayerMask.NameToLayer("Visible");
         public static readonly int VISION_BLOCKER_LAYER = LayerMask.NameToLayer("VisionBlocker");
+        public static readonly int HIDER_LAYER = LayerMask.NameToLayer("HidingArea");
 
         public static readonly int SELECTION_LAYER = LayerMask.NameToLayer("Selection");
 
