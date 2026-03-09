@@ -4,6 +4,7 @@ using UnityEngine;
 namespace Kuuasema.Utils {
     public static class LayerHelper {
         public static readonly int DEFAULT_LAYER = LayerMask.NameToLayer("Default");
+        public static readonly int GEOMETRY_LAYER = LayerMask.NameToLayer("Geometry");
         public static readonly int TRANSPARENT_FX_LAYER = LayerMask.NameToLayer("TransparentFX");
         public static readonly int IGNORE_RAYCAST_LAYER = LayerMask.NameToLayer("Ignore Raycast");
         public static readonly int GROUND_LAYER = LayerMask.NameToLayer("Ground");
