@@ -16,6 +16,7 @@ namespace Kuuasema.Utils {
         public static readonly int HIDER_LAYER = LayerMask.NameToLayer("HidingArea");
 
         public static readonly int SELECTION_LAYER = LayerMask.NameToLayer("Selection");
+        public static readonly int BODYPART_LAYER = LayerMask.NameToLayer("BodyPart");
 
 
         public static List<string> LayerNames { get; private set; } = new List<string>();
