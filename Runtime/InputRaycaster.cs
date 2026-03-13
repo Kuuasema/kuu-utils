@@ -97,7 +97,7 @@ namespace Kuuasema.Utils
             {
                 if (Camera.main != null)
                 {
-                    this.Ray = GameCamera.Camera.ScreenPointToRay(this.ScreenPosition);
+                    this.Ray = Camera.main.ScreenPointToRay(this.ScreenPosition);
                     int hits = Physics.RaycastNonAlloc(this.Ray, this.HitsAll);
                     for (int i = 0; i < hits; i++)
                     {
